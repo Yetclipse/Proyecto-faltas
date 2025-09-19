@@ -16,7 +16,7 @@ public class BaseDeDatos {
     public static Connection getConnection() throws BDexcepcion{
     Connection con=null;
     try{
-        con = DriverManager.getConnection("____________","root","");
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/proyectosfaltas?zeroDateTimeBehavior=CONVERT_TO_NULL","root","");
     }catch (SQLException sqle){
         throw new BDexcepcion("Error de conexion de base de datos");
     }
