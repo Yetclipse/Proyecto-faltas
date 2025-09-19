@@ -19,15 +19,6 @@ public class Docente {
     private String turno;
     private List<Licencia> licencias;
 
-    public Docente(String cedula, String nombre, String apellido, String materia, String turno) {
-        this.cedula = cedula;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.materia = materia;
-        this.turno = turno;
-        this.licencias = new ArrayList<>();
-    }
-
    
 //Se registra un docente no necesariamente tiene que tener una licencia ya asociada en el momento de su creación, por lo tanto 
 // los dos siguientes metodos funcionan para settear o retornar las licencias
