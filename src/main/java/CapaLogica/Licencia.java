@@ -5,8 +5,6 @@
 package CapaLogica;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 /** Como se que vas a preguntar Fran aca esta la explicación de esta clase 
  * Cada licencia (o inasistencia) tiene su propia información: fecha de inicio, fecha de fin, motivo, y grupos afectados.
@@ -21,26 +19,37 @@ lo mismo pasa con grupo tonto
  * @author sebas
  */
 public class Licencia {
+    private int id;
     private String motivo;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
-    private List<Grupo> gruposAfectados;
+    private String gruposAfectados;
 
-    public Licencia(String motivo, LocalDate fechaInicio, LocalDate fechaFin) {
+    public Licencia(){}
+    public Licencia(int id, LocalDate fechaInicio, LocalDate fechaFin, String grupos, String motivo) {
+        this.id = id;
         this.motivo = motivo;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.gruposAfectados = new ArrayList<>();
+        this.gruposAfectados = grupos; 
     }
 
     // Getters y Setters
 
-    public void agregarGrupo(Grupo grupo) {
-        gruposAfectados.add(grupo);
+    public int getId() {
+        return id;
     }
 
-    public List<Grupo> getGruposAfectados() {
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getGruposAfectados() {
         return gruposAfectados;
+    }
+
+    public void setGruposAfectados(String gruposAfectados) {
+        this.gruposAfectados = gruposAfectados;
     }
 
     public String getMotivo() {

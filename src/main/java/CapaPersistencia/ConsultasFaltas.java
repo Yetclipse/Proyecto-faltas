@@ -6,48 +6,49 @@ package CapaPersistencia;
 
 import CapaLogica.Docente;
 import CapaExcepcion.BDexcepcion;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import CapaExcepcion.FaltasExcepcion;
 import CapaLogica.Licencia;
-import java.sql.Array;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 /**
  *
  * @author sebas
  */
 public class ConsultasFaltas {
-    private static final String SQLGuardar = ("INSERT INTO persona.personas(Ci,Nombre,Apellido, Materia, Turno, licencia)VALUES (?,?,?,?,?,?)");
-    private static final String SQL_CONSULTAR_DOCENTE= ("SELECT * FROM persona.personas WHERE (CI=?)");
-    private static final String SQL_ELIMINAR_DOCENTE= ("DELETE FROM personas WHERE CI=?");
+    private static final String SQL_GUARDAR_DOCENTE = ("INSERT INTO proyectofaltas.docentes(Cedula, Nombre, Apellido, Materia, Turno)VALUES (?,?,?,?,?)");
+    private static final String SQL_CONSULTAR_DOCENTE= ("SELECT * FROM proyectofaltas.docentes WHERE (Cedula=?)");
+    private static final String SQL_ELIMINAR_DOCENTE= ("DELETE FROM proyectofaltas.docentes WHERE (Cedula=?)");
+    private static final String SQL_LISTAR_LICENCIAS_POR_DOCENTE =("SELECT * FROM proyectofaltas.licencias WHERE docente_ci = ? ORDER BY fecha_inicio DESC");
+    private static final String SQL_GUARDAR_LICENCIA = ("INSERT INTO proyectofaltas.licencias (docente_ci, Motivo, Fecha_inicio, Fecha_fin, Grupos_afectados) VALUES (?, ?, ?, ?, ?)");
     public BaseDeDatos cone = new BaseDeDatos();
     public PreparedStatement ps;
     public ResultSet rs;
     
-    public void GuardarDocente (Docente docente) throws Exception, BDexcepcion {
-    try{
+    // DOCENTES
+    public void GuardarDocente (Docente docente) throws FaltasExcepcion, Exception, BDexcepcion {
+    
+        try{
         int resultado = 0; //Si da un numero negativo esque salio mal, y si es positivo es porque ingreso correctamente
         Connection con = cone.getConnection();//se conecto
-        ps =(PreparedStatement) con.prepareStatement(SQLGuardar);
+        ps =(PreparedStatement) con.prepareStatement(SQL_GUARDAR_DOCENTE);
                 
         ps.setString (1, docente.getCedula());
         ps.setString(2, docente.getNombre());
         ps.setString(3, docente.getApellido());
         ps.setString(4, docente.getMateria());
         ps.setString(5, docente.getTurno());
-        ps.setArray(6, (Array) docente.getLicencias());
         
         resultado=ps.executeUpdate();
         con.close();
     }catch(SQLException SQLE){
-        throw new Exception("Santiago Rosas dice que no te conectaste a la base de datos");
+        throw new FaltasExcepcion("Santiago Rosas dice que no te conectaste a la base de datos");
     }
     
     
 }
-    
+    // Devuelve el docente con TODAS sus licencias cargadas.
     public Docente ConsultarDocente (String ci) throws Exception, BDexcepcion{
         Docente docente =new Docente();
         try{
@@ -56,46 +57,138 @@ public class ConsultasFaltas {
             ps=(PreparedStatement)con.prepareStatement(SQL_CONSULTAR_DOCENTE);
             ps.setString(1, ci);
             rs=ps.executeQuery();
-            if(rs.next()){
-                String Ci=rs.getString("CI");
-                String nombre=rs.getString("Nombre");
-                String apellido=rs.getString("Apellido");
-                String materia=rs.getString("Materia");
-                String turno=rs.getString("Turno");
-                List<Array> licencia= (List<Array>)rs.getArray("Licencia");
-                docente.setCedula(Ci);
-                docente.setNombre(nombre);
-                docente.setApellido(apellido);
-                docente.setMateria(materia);
-                docente.setTurno(turno);
-                docente.agregarLicencia((Licencia) licencia);
-                
-            }else{
-                throw new FaltasExcepcion("No encontrado");  
+            if (rs.next()) {
+                    docente = new Docente();
+                    docente.setCedula(rs.getString("Cedula"));
+                    docente.setNombre(rs.getString("Nombre"));
+                    docente.setApellido(rs.getString("Apellido"));
+                    docente.setMateria(rs.getString("Materia"));
+                    docente.setTurno(rs.getString("Turno"));
+                } else {
+                    throw new FaltasExcepcion("No se encontro docente"+ ci);
+                }
+            // Cargar licencias de ese docente
+            try (PreparedStatement psLic = con.prepareStatement(SQL_LISTAR_LICENCIAS_POR_DOCENTE)) {
+                psLic.setString(1, ci);
+                try (ResultSet rl = psLic.executeQuery()) {
+                    //como rl.next() devuelve 1(esta en una fila) o 0(no esta en una fila) el while seguira mientras haya filas cuando llegue al final 
+                    // o no haya filas queda en 0 que eso es false y ahi se rompe
+                    while (rl.next()) {
+                        Licencia lic = new Licencia();
+                        lic.setId(rl.getInt("id"));
+                        lic.setMotivo(rl.getString("Motivo"));
+
+                        Date fi = rl.getDate("Fecha_inicio");
+                        Date ff = rl.getDate("Fecha_fin");
+                        // el " : " funciona como un if, o sea si fi es distinto a null usa el localDate sino usar null
+                        // Basicamente= condicion ? valor_si_true : valor_si_false
+                        // y por si acaso el LocalDate es una clase API de java que funciona para poner fechas de anhio, mes y dia (No hora, minutos ni segundos)
+                        lic.setFechaInicio(fi != null ? fi.toLocalDate() : null);
+                        lic.setFechaFin(ff != null ? ff.toLocalDate() : null);
+
+                        lic.setGruposAfectados(rl.getString("Grupos_afectados"));
+
+                        docente.agregarLicencia(lic);
+                    }
+                }
             }con.close();
         }catch (Exception e){
-            throw new FaltasExcepcion("No encontrado");
+            throw new FaltasExcepcion("Error consultando la licencia de Docente");
         }
         return docente;
     }
     
-    public void eliminarDocente (String ci) throws FaltasExcepcion, Exception{
-        
-        String Eliminacion = null;
-        try{
-            Connection conexion;
-            conexion = cone.getConnection();
-            ps = conexion.prepareStatement(SQL_ELIMINAR_DOCENTE);
-            ps.setString(1, ci);
-            int resultado = ps.executeUpdate();
-            if(rs.next()){
-                Eliminacion = "Mision cumplida. El docente ya no lo molestara";                
-            }else{
-                Eliminacion = "El docente que desea eliminar no se ha encontrado, alguien ya se ha encargado.";
+    public String eliminarDocente(String ci) throws FaltasExcepcion, BDexcepcion {
+    int MYSQL_FK_ERROR = 1451; // Código de error: no se puede borrar porque tiene licencias asociadas
+
+    try (Connection con = cone.getConnection();
+         PreparedStatement ps = con.prepareStatement(SQL_ELIMINAR_DOCENTE)) {
+
+        ps.setString(1, ci);
+        int filas = ps.executeUpdate(); // cuántos docentes se borraron
+
+        if (filas > 0) {
+            return "Misión cumplida. El docente ya no lo molestará";
+        } else {
+            return "El docente que desea eliminar no se ha encontrado... alguien ya se encargó antes️";
+        }
+
+    } catch (SQLException e) {
+        if (e.getErrorCode() == MYSQL_FK_ERROR) {
+            throw new FaltasExcepcion("No se puede eliminar al docente porque tiene licencias activas. Primero elimine sus licencias");
+        }
+        throw new FaltasExcepcion("Error inesperado eliminando docente ");
+    }
+}
+
+    
+    // LICENCIAS
+    public int guardarLicencia(String docenteCi, Licencia lic) throws FaltasExcepcion, BDexcepcion {
+        try (Connection con = cone.getConnection();
+            PreparedStatement ps = con.prepareStatement(SQL_GUARDAR_LICENCIA)) {
+
+            ps.setString(1, docenteCi);
+            ps.setString(2, lic.getMotivo());
+            //en donde esta consultardocente esta la explicacion del if acortado (" ? " " : ")
+            //el Date.valueOf(...) es un metodo que convierte el formato anhio, mes y dia en un string ya que hay que insertarla en la BD
+            ps.setDate(3, lic.getFechaInicio() != null ? Date.valueOf(lic.getFechaInicio()) : null);
+            ps.setDate(4, lic.getFechaFin() != null ? Date.valueOf(lic.getFechaFin()) : null);
+            ps.setString(5, lic.getGruposAfectados());
+
+            ps.executeUpdate();
+            // el ps.getGeneratedKeys() es para recuperar la id que la BD genera automaticamente
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    int idGen = keys.getInt(1);
+                    lic.setId(idGen);
+                    return idGen;
+                }
             }
-            conexion.close();
-        } catch (Exception e){
-            System.out.println(e);
+            return 0;
+        } catch (SQLException e) {
+        throw new FaltasExcepcion("Error al guardar licencia");
         }
     }
+    
+    // Listar licencias para la Jtable
+    // el CURDATE() funciona para que el intervalo sea de 30 dias y no listar TODAS las inasistencias
+    private static final String SQL_LISTAR_FALTA = ("SELECT d.*, l.* FROM proyectofaltas.licencias l JOIN proyectofaltas.docentes d "
+            + "ON d.Cedula = l.docente_ci WHERE l.Fecha_inicio >= CURDATE() - INTERVAL 30 DAY ORDER BY l.fecha_inicio DESC");
+    
+    
+    public List<LicenciaRow> listarParaTabla() throws BDexcepcion {
+    List<LicenciaRow> out = new ArrayList<>();
+    try (Connection con = cone.getConnection();
+         PreparedStatement ps = con.prepareStatement(SQL_LISTAR_FALTA);
+         ResultSet rs = ps.executeQuery()) {
+        //como rl.next() devuelve 1(esta en una fila) o 0(no esta en una fila) el while seguira mientras haya filas cuando llegue al final 
+        // o no haya filas queda en 0 que eso es false y ahi se rompe
+        while (rs.next()) {
+            String cedula  = rs.getString("Cedula");
+            String nombre  = rs.getString("Nombre");
+            String apellido= rs.getString("Apellido");
+            //en donde esta consultardocente esta la explicacion del if acortado (" ? " " : ")
+            //lo que hago enrealidad es poner el nombre completo en el docente, si no hay un valor se poner "" o sea nada
+            String docente = (nombre != null ? nombre : "")+(apellido != null ? " " + apellido : ""); // " " + apellido un espacio entre el nombre y apellido tontin
+            String materia = rs.getString("Materia");
+            String turno   = rs.getString("Turno");
+            String motivo  = rs.getString("Motivo");
+
+            java.sql.Date fi = rs.getDate("Fecha_inicio");
+            java.sql.Date ff = rs.getDate("Fecha_fin");
+            //en donde esta consultardocente esta la explicacion del if acortado (" ? " " : ")
+            // si no hay fecha pone vacio como cuando ponen matematicas y no colocan hasta que dia
+            java.time.LocalDate desde = (fi != null) ? fi.toLocalDate() : null;
+            java.time.LocalDate hasta = (ff != null) ? ff.toLocalDate() : null;
+
+            String grupos  = rs.getString("Grupos_afectados");
+
+            out.add(new LicenciaRow(cedula, docente, materia, turno, motivo, desde, hasta, grupos));
+        }
+    } catch (SQLException e) {
+        throw new RuntimeException("Error listando licencias para UI", e);
+    }
+    return out;
+}
+
 }
