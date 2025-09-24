@@ -157,8 +157,8 @@ public class ConsultasFaltas {
             + "ON d.Cedula = l.docente_ci WHERE l.Fecha_inicio >= CURDATE() - INTERVAL 30 DAY ORDER BY l.fecha_inicio DESC");
     
     
-    public List<LicenciaRow> listarParaTabla() throws BDexcepcion {
-    List<LicenciaRow> out = new ArrayList<>();
+    public List<LicenciaFilas> listarParaTabla() throws BDexcepcion {
+    List<LicenciaFilas> out = new ArrayList<>();
     try (Connection con = cone.getConnection();
          PreparedStatement ps = con.prepareStatement(SQL_LISTAR_FALTA);
          ResultSet rs = ps.executeQuery()) {
@@ -184,7 +184,7 @@ public class ConsultasFaltas {
 
             String grupos  = rs.getString("Grupos_afectados");
 
-            out.add(new LicenciaRow(cedula, docente, materia, turno, motivo, desde, hasta, grupos));
+            out.add(new LicenciaFilas(cedula, docente, materia, turno, motivo, desde, hasta, grupos));
         }
     } catch (SQLException e) {
         throw new RuntimeException("Error listando licencias", e);

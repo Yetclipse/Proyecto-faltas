@@ -4,18 +4,63 @@
  */
 package CapaGrafica;
 
+import CapaExcepcion.BDexcepcion;
+import CapaPersistencia.ConsultasFaltas;
+import CapaPersistencia.LicenciaFilas;
+import javax.swing.table.DefaultTableModel;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author sebas
  */
 public class Tabla extends javax.swing.JFrame {
-
+    private DefaultTableModel modeloLicencias;
+    private final ConsultasFaltas ConsultarFaltas = new ConsultasFaltas();
+    private final DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     /**
      * Creates new form Tabla
      */
     public Tabla() {
         initComponents();
+        setTitle("Faltas de Docentes");
+        setLocationRelativeTo(null);
+        configurarTabla();
+        cargarLicencias();
     }
+private void configurarTabla(){
+    modeloLicencias = new DefaultTableModel();
+    modeloLicencias.setColumnIdentifiers(new Object[]{
+    "Cedula", "Docente", "Materia", "Turno",
+    "Motivo", "Desde", "Hasta", "Grupos"
+});
+    jTable1.setModel(modeloLicencias);
+}
+private void cargarLicencias(){
+    modeloLicencias.setRowCount(0);// Lo que hace es limpiar
+    //Profe si lee esto; este pedacito me lo recomendo el mismo Neatbeans y no entendi esta parte asi que xd    
+    try {
+        List<LicenciaFilas> filas = ConsultarFaltas.listarParaTabla();
+        for (LicenciaFilas l : filas){
+            modeloLicencias.addRow(new Object[]{
+                l.getCedula(),
+                l.getDocente(),
+                l.getMateria(),
+                l.getTurno(),
+                l.getMotivo(),
+                l.getDesde() != null ? l.getDesde().format(df) : "",
+                l.getHasta() != null ? l.getHasta().format(df) : "",
+                l.getGrupos()
+            });
+    }  
+    } catch (BDexcepcion ex) {
+        Logger.getLogger(Tabla.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -28,6 +73,8 @@ public class Tabla extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -44,25 +91,59 @@ public class Tabla extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
+        jButton1.setText("Atras");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("Refrescar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 574, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 636, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2)))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 444, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        dispose();               
+        Inicio Ventana = new Inicio();
+        Ventana.setVisible(true);
+        setVisible(false);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        cargarLicencias();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -100,6 +181,8 @@ public class Tabla extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables

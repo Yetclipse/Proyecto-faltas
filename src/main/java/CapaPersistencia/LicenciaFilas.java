@@ -10,7 +10,7 @@ package CapaPersistencia;
  */
 //Esta clase se encargara de armar la fila para mostrarla en la tabla
 //Por eso LicenciaRow (Row = fila pero en ingles :v)
-public class LicenciaRow {
+public class LicenciaFilas {
     private final String cedula;
     private final String docente;
     private final String materia;
@@ -20,7 +20,7 @@ public class LicenciaRow {
     private final java.time.LocalDate hasta;
     private final String grupos;
     
-    public LicenciaRow(String cedula, String docente, String materia, String turno,
+    public LicenciaFilas(String cedula, String docente, String materia, String turno,
                        String motivo, java.time.LocalDate desde, java.time.LocalDate hasta,
                        String grupos) {
         this.cedula = cedula;
