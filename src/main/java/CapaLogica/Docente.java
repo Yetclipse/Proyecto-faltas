@@ -4,6 +4,7 @@
  */
 package CapaLogica;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,13 +17,15 @@ public class Docente {
     private String apellido;
     private String materia;
     private String turno;
-    private List<Licencia> licencias;
+    private final List<Licencia> licencias = new ArrayList<>();
 
    
 //Se registra un docente no necesariamente tiene que tener una licencia ya asociada en el momento de su creación, por lo tanto 
 // los dos siguientes metodos funcionan para settear o retornar las licencias
-    public void agregarLicencia(Licencia licencia) {
-        this.licencias = (List<Licencia>) licencia;
+    public void agregarLicencia(Licencia li) {
+        if(li != null){
+            licencias.add(li);
+        }
     }
 
     public List<Licencia> getLicencias() {

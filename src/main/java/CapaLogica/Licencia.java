@@ -11,30 +11,42 @@ import java.time.LocalDate;
 
 Por ejemplo:
 
-Licencia l1 = new Licencia("Reposo médico", LocalDate.of(2025, 9, 1), LocalDate.of(2025, 9, 5));
-lo mismo pasa con grupo tonto
+Licencia l1 = new Licencia("Reposo médico", LocalDate.of(2025, 9, 1), LocalDate.of(2025, 9, 5), grupo);
 
 * /
  *
  * @author sebas
  */
+import java.time.LocalDate;
+
 public class Licencia {
-    private int id;
+    private int id;                     // es autoincrement
     private String motivo;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
     private String gruposAfectados;
 
-    public Licencia(){}
-    public Licencia(int id, LocalDate fechaInicio, LocalDate fechaFin, String grupos, String motivo) {
+    public Licencia() {} //por si acaso uno vacio
+
+    public Licencia(String motivo, LocalDate fechaInicio, LocalDate fechaFin, String gruposAfectados) {
+        this.motivo = motivo;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.gruposAfectados = gruposAfectados;
+        validarFechas(); //es un metodo que esta creado por alla abajo
+    }
+
+    // Constructor completo (para leer desde la BD)
+    public Licencia(int id, String motivo, LocalDate fechaInicio, LocalDate fechaFin, String gruposAfectados) {
         this.id = id;
         this.motivo = motivo;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.gruposAfectados = grupos; 
+        this.gruposAfectados = gruposAfectados;
+        validarFechas(); //es un metodo que esta creado por alla abajo
     }
 
-    // Getters y Setters
+    // --- Getters/Setters ---
 
     public int getId() {
         return id;
@@ -42,14 +54,6 @@ public class Licencia {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getGruposAfectados() {
-        return gruposAfectados;
-    }
-
-    public void setGruposAfectados(String gruposAfectados) {
-        this.gruposAfectados = gruposAfectados;
     }
 
     public String getMotivo() {
@@ -75,5 +79,28 @@ public class Licencia {
     public void setFechaFin(LocalDate fechaFin) {
         this.fechaFin = fechaFin;
     }
+
+    public String getGruposAfectados() {
+        return gruposAfectados;
+    }
+
+    public void setGruposAfectados(String gruposAfectados) {
+        this.gruposAfectados = gruposAfectados;
+    }
     
+
+    // para asegurr de que el usuario no sea tonto y ponta que termina antes de la fecha de inicio
+    private void validarFechas() throws IllegalArgumentException {
+        if (fechaInicio != null && fechaFin != null && fechaFin.isBefore(fechaInicio)) {
+            throw new IllegalArgumentException("La fecha de fin no puede ser anterior a la fecha de inicio");
+        }
+    }
+
+
+    @Override
+    public String toString() {
+        return "Licencia{id=" + id + ", motivo='" + motivo + '\'' +
+               ", desde=" + fechaInicio + ", hasta=" + fechaFin +
+               ", grupos='" + gruposAfectados + "'}";
+    }
 }

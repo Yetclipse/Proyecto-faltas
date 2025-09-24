@@ -42,9 +42,10 @@ public class ConsultasFaltas {
         
         resultado=ps.executeUpdate();
         con.close();
-    }catch(SQLException SQLE){
-        throw new FaltasExcepcion("Santiago Rosas dice que no te conectaste a la base de datos");
-    }
+    } catch (SQLException e) {
+    String detalle = "SQLState=" + e.getSQLState() + ", code=" + e.getErrorCode() + ", msg=" + e.getMessage();
+    throw new FaltasExcepcion("Santiago te dice tonto hay un error al guardar docente: " + detalle, e);
+}
     
     
 }
@@ -93,7 +94,7 @@ public class ConsultasFaltas {
                 }
             }con.close();
         }catch (Exception e){
-            throw new FaltasExcepcion("Error consultando la licencia de Docente");
+            throw new FaltasExcepcion("Error consultando la licencia de Docente"+ e.getMessage(), e);
         }
         return docente;
     }
@@ -117,7 +118,7 @@ public class ConsultasFaltas {
         if (e.getErrorCode() == MYSQL_FK_ERROR) {
             throw new FaltasExcepcion("No se puede eliminar al docente porque tiene licencias activas. Primero elimine sus licencias");
         }
-        throw new FaltasExcepcion("Error inesperado eliminando docente ");
+        throw new FaltasExcepcion("Error inesperado eliminando docente "+ e.getMessage(), e);
     }
 }
 
@@ -125,7 +126,7 @@ public class ConsultasFaltas {
     // LICENCIAS
     public int guardarLicencia(String docenteCi, Licencia lic) throws FaltasExcepcion, BDexcepcion {
         try (Connection con = cone.getConnection();
-            PreparedStatement ps = con.prepareStatement(SQL_GUARDAR_LICENCIA)) {
+            PreparedStatement ps = con.prepareStatement(SQL_GUARDAR_LICENCIA, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, docenteCi);
             ps.setString(2, lic.getMotivo());
@@ -146,7 +147,7 @@ public class ConsultasFaltas {
             }
             return 0;
         } catch (SQLException e) {
-        throw new FaltasExcepcion("Error al guardar licencia");
+        throw new FaltasExcepcion("Error al guardar licencia" + e);
         }
     }
     
@@ -186,7 +187,7 @@ public class ConsultasFaltas {
             out.add(new LicenciaRow(cedula, docente, materia, turno, motivo, desde, hasta, grupos));
         }
     } catch (SQLException e) {
-        throw new RuntimeException("Error listando licencias para UI", e);
+        throw new RuntimeException("Error listando licencias", e);
     }
     return out;
 }
