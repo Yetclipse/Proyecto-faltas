@@ -41,7 +41,7 @@ private void configurarTabla(){
 }
 private void cargarLicencias(){
     modeloLicencias.setRowCount(0);// Lo que hace es limpiar
-    //Profe si lee esto; este pedacito me lo recomendo el mismo Neatbeans y no entendi esta parte asi que xd    
+      
     try {
         List<LicenciaFilas> filas = ConsultarFaltas.listarParaTabla();
         for (LicenciaFilas l : filas){
@@ -57,6 +57,7 @@ private void cargarLicencias(){
             });
     }  
     } catch (BDexcepcion ex) {
+        //Profe si lee esto; este pedacito me lo recomendo el mismo Neatbeans y no entendi esta parte asi que xd  
         Logger.getLogger(Tabla.class.getName()).log(Level.SEVERE, null, ex);
     }
     
