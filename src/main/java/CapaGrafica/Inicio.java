@@ -8,7 +8,11 @@ package CapaGrafica;
  *
  * @author sebas
  */
+import CapaExcepcion.BDexcepcion;
 import CapaGrafica.Tabla;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 public class Inicio extends javax.swing.JFrame {
 
     /**
@@ -55,6 +59,11 @@ public class Inicio extends javax.swing.JFrame {
         jLabel4.setText("Tabla de Faltas");
 
         jButton2.setText("Continuar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel5.setFont(new java.awt.Font("Comic Sans MS", 1, 18)); // NOI18N
         jLabel5.setText("Registrar");
@@ -107,6 +116,13 @@ public class Inicio extends javax.swing.JFrame {
         VentanaTabla.setVisible(true);
         setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+            dispose();
+            Seleccion Ventana = new Seleccion();
+            Ventana.setVisible(true);
+            setVisible(false);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments

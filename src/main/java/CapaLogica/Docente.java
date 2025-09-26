@@ -71,6 +71,10 @@ public class Docente {
     public void setTurno(String turno) {
         this.turno = turno;
     }
+@Override
+public String toString() {
+    return apellido + " " + nombre + " (" + cedula + ")";
+}
 
    
 }

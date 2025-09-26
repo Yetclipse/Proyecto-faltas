@@ -17,11 +17,14 @@ import java.util.List;
  * @author sebas
  */
 public class ConsultasFaltas {
+    //help me no queria poner tantas consultas :(
     private static final String SQL_GUARDAR_DOCENTE = ("INSERT INTO proyectofaltas.docentes(Cedula, Nombre, Apellido, Materia, Turno)VALUES (?,?,?,?,?)");
     private static final String SQL_CONSULTAR_DOCENTE= ("SELECT * FROM proyectofaltas.docentes WHERE (Cedula=?)");
     private static final String SQL_ELIMINAR_DOCENTE= ("DELETE FROM proyectofaltas.docentes WHERE (Cedula=?)");
     private static final String SQL_LISTAR_LICENCIAS_POR_DOCENTE =("SELECT * FROM proyectofaltas.licencias WHERE docente_ci = ? ORDER BY fecha_inicio DESC");
+    private static final String SQL_ELIMINAR_LICENCIA= ("DELETE FROM proyectofaltas.licencias WHERE id = ? AND docente_ci = ?");
     private static final String SQL_GUARDAR_LICENCIA = ("INSERT INTO proyectofaltas.licencias (docente_ci, Motivo, Fecha_inicio, Fecha_fin, Grupos_afectados) VALUES (?, ?, ?, ?, ?)");
+    private static final String SQL_LISTAR_DOCENTES = ("SELECT * FROM proyectofaltas.docentes ORDER BY Apellido, Nombre");
     public BaseDeDatos cone = new BaseDeDatos();
     public PreparedStatement ps;
     public ResultSet rs;
@@ -50,7 +53,7 @@ public class ConsultasFaltas {
     
 }
     // Devuelve el docente con TODAS sus licencias cargadas.
-    public Docente ConsultarDocente (String ci) throws Exception, BDexcepcion{
+    public Docente ConsultarDocente (String ci) throws FaltasExcepcion, Exception, BDexcepcion{
         Docente docente =new Docente();
         try{
             Connection con;
@@ -150,9 +153,33 @@ public class ConsultasFaltas {
         throw new FaltasExcepcion("Error al guardar licencia" + e);
         }
     }
+    //Listar docente para una lista de la capa grafica (estoy en la locura chicos)
+    public java.util.List<Docente> listarDocentes() throws FaltasExcepcion, BDexcepcion, SQLException{
+        java.util.List<Docente> out = new java.util.ArrayList<>();
+        //Y dale con el try
+        try(Connection con = cone.getConnection();
+                PreparedStatement ps = con.prepareStatement(SQL_LISTAR_DOCENTES);
+                ResultSet rs = ps.executeQuery()){
+            //Esto ya lo habia explicado pero como reconozco que soy olvidadizo
+            //como rl.next() devuelve 1(esta en una fila) o 0(no esta en una fila) el while seguira mientras haya filas cuando llegue al final 
+            // o no haya filas queda en 0 que eso es false y ahi se rompe
+            while(rs.next()){
+                Docente d = new Docente();
+                d.setCedula(rs.getString("Cedula"));
+                d.setNombre(rs.getString("Nombre"));
+                d.setApellido(rs.getString("Apellido"));
+                d.setMateria(rs.getString("Materia"));
+                d.setTurno(rs.getString("Turno"));
+                out.add(d);
+            }
+        }catch(java.sql.SQLException e){
+            throw new FaltasExcepcion("Error listando docentes"+ e.getMessage(), e);
+        }
+        return out;
+    }
     
     // Listar licencias para la Jtable
-    // el CURDATE() funciona para que el intervalo sea de 30 dias y no listar TODAS las inasistencias
+    // el CURDATE() funciona para que el intervalo sea de 30 dias y no listar TODAS las inasistencias    
     private static final String SQL_LISTAR_FALTA = ("SELECT d.*, l.* FROM proyectofaltas.licencias l JOIN proyectofaltas.docentes d "
             + "ON d.Cedula = l.docente_ci WHERE l.Fecha_inicio >= CURDATE() - INTERVAL 30 DAY ORDER BY l.fecha_inicio DESC");
     
@@ -191,5 +218,56 @@ public class ConsultasFaltas {
     }
     return out;
 }
+// Esto funciona para mostras la licencias de un docente (solo licencias no los datos del docente)
+public java.util.List<LicenciaFilas> listarLicenciasPorDocente(String ci) throws FaltasExcepcion, BDexcepcion {
+    java.util.List<LicenciaFilas> out = new java.util.ArrayList<>();
+    try (Connection con = cone.getConnection();
+        PreparedStatement ps = con.prepareStatement(SQL_LISTAR_LICENCIAS_POR_DOCENTE)) {
 
+        ps.setString(1, ci);
+        try (java.sql.ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                var id = rs.getInt("id");
+                var mot = rs.getString("Motivo");
+                var fi  = rs.getDate("Fecha_inicio");
+                var ff  = rs.getDate("Fecha_fin");
+                var grp = rs.getString("Grupos_afectados");
+
+                LicenciaFilas row = new LicenciaFilas(
+                    id,
+                    ci,               // cedula
+                    "",               // docente no se usara para mostrar la licencia
+                    "",               // materia no se usara para mostrar la licencia
+                    "",               // turno no se usara para mostrar la licencia
+                    mot,
+                    fi != null ? fi.toLocalDate() : null,
+                    ff != null ? ff.toLocalDate() : null,
+                    grp
+                );
+                out.add(row);
+            }
+        }
+    } catch (java.sql.SQLException e) {
+        throw new FaltasExcepcion("Error listando licencias por docente: " + e.getMessage(), e);
+    }
+    return out;
+}
+
+//Eliminar 1 licencia (por seguridad valida la cédula + id)
+public String eliminarLicenciaDeDocente(String ci, int idLicencia) throws FaltasExcepcion, BDexcepcion, SQLException{
+    try (Connection con = cone.getConnection();
+        PreparedStatement ps = con.prepareStatement(SQL_ELIMINAR_LICENCIA)){
+        ps.setInt(1, idLicencia);
+        ps.setString(2, ci);
+        int filas = ps.executeUpdate(); //1 si borro
+        if (filas > 0) {
+            return "Misión cumplida.";
+        } else {
+            return "Hubo un error y la verdad no se... Cualquier cosa llamar a Sebastien";
+        }
+    }catch (java.sql.SQLException e){
+        throw new FaltasExcepcion("Error eliminando licencia: " + e.getMessage(), e);
+    }
+    
+}
 }

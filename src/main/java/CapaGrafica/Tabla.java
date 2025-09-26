@@ -34,7 +34,7 @@ public class Tabla extends javax.swing.JFrame {
 private void configurarTabla(){
     modeloLicencias = new DefaultTableModel();
     modeloLicencias.setColumnIdentifiers(new Object[]{
-    "Cedula", "Docente", "Materia", "Turno",
+    "Docente", "Materia", "Turno",
     "Motivo", "Desde", "Hasta", "Grupos"
 });
     jTable1.setModel(modeloLicencias);
@@ -46,7 +46,6 @@ private void cargarLicencias(){
         List<LicenciaFilas> filas = ConsultarFaltas.listarParaTabla();
         for (LicenciaFilas l : filas){
             modeloLicencias.addRow(new Object[]{
-                l.getCedula(),
                 l.getDocente(),
                 l.getMateria(),
                 l.getTurno(),
