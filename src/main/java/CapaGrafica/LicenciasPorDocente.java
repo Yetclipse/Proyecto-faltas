@@ -336,7 +336,7 @@ public class LicenciasPorDocente extends javax.swing.JFrame {
         
         String ciDocente1 = this.ciDocente;
          int conf = JOptionPane.showConfirmDialog(this,
-                "¿Eliminar la licencia seleccionada?", "Confirmar",
+                "¿Eliminar el docente seleccionada?", "Confirmar",
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (conf != JOptionPane.YES_OPTION) return;
 
