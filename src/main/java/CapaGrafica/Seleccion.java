@@ -21,7 +21,7 @@ import javax.swing.event.DocumentListener;
  *ANTES DE SEGUIR AVANZANDO
  * use Document ya que es el modelo de datos que guarda lo
  * que el usuario escribe
- * sire para escuchar cambios en tiempo real (DocumentListener) 
+ * sirve para escuchar cambios en tiempo real (DocumentListener) 
  * esto para la barra de busqueda sin tener que hacer click en el boton de buscar 
  * aprevechando esto use .getDocument en vez de .getText
  * 
@@ -65,6 +65,7 @@ public class Seleccion extends javax.swing.JFrame {
         textDocente3 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList = new javax.swing.JList();
+        textDocente4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -75,12 +76,15 @@ public class Seleccion extends javax.swing.JFrame {
             }
         });
 
-        txt.setText("Ingrese nombre");
-
         jButton2.setText("Continuar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         textDocente.setFont(new java.awt.Font("Comic Sans MS", 1, 18)); // NOI18N
-        textDocente.setText("Registrar docente");
+        textDocente.setText("Buscar");
 
         jButton3.setText("Seleccionar");
 
@@ -107,18 +111,15 @@ public class Seleccion extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jList);
 
+        textDocente4.setFont(new java.awt.Font("Comic Sans MS", 1, 18)); // NOI18N
+        textDocente4.setText("Registrar docente");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(76, 76, 76)
-                        .addComponent(textDocente))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(115, 115, 115)
-                        .addComponent(jButton2))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(56, 56, 56)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -130,23 +131,41 @@ public class Seleccion extends javax.swing.JFrame {
                         .addComponent(jButton1))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(104, 104, 104)
-                        .addComponent(jButton3)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jButton2)
+                            .addComponent(jButton3))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 130, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txt, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(txt, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(22, 22, 22))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(textDocente)
+                        .addGap(58, 58, 58)))
                 .addGap(56, 56, 56))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(86, 86, 86)
+                    .addComponent(textDocente4)
+                    .addContainerGap(354, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1)
-                    .addComponent(txt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(25, 25, 25)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(textDocente)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 451, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(35, Short.MAX_VALUE))
+                .addGap(23, 23, 23))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(91, 91, 91)
                 .addComponent(textDocente1)
@@ -157,10 +176,13 @@ public class Seleccion extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(textDocente)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
-                .addGap(122, 122, 122))
+                .addGap(114, 114, 114))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap(379, Short.MAX_VALUE)
+                    .addComponent(textDocente4)
+                    .addGap(145, 145, 145)))
         );
 
         pack();
@@ -172,6 +194,13 @@ public class Seleccion extends javax.swing.JFrame {
         Ventana.setVisible(true);
         setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        dispose();               
+        Registrar_Docente Re = new Registrar_Docente();
+        Re.setVisible(true);
+        setVisible(false);        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -219,6 +248,7 @@ public class Seleccion extends javax.swing.JFrame {
     private javax.swing.JLabel textDocente1;
     private javax.swing.JLabel textDocente2;
     private javax.swing.JLabel textDocente3;
+    private javax.swing.JLabel textDocente4;
     private javax.swing.JTextField txt;
     // End of variables declaration//GEN-END:variables
 
@@ -270,7 +300,7 @@ public class Seleccion extends javax.swing.JFrame {
     try {
         docentesBase = consultar.listarDocentes();
         for (Docente d : docentesBase) {
-            modeloLista.addElement(d); // se verá con el renderer
+            modeloLista.addElement(d); //
         }
     } catch (FaltasExcepcion ex) {
         JOptionPane.showMessageDialog(this, "Error cargando docentes:\n" + ex.getMessage(),
