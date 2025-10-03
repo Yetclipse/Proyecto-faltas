@@ -32,7 +32,9 @@ public class LicenciasPorDocente extends javax.swing.JFrame {
     private java.util.List<String> gruposBase = new java.util.ArrayList<>();
     // Mantener selección aunque se filtre
     private final java.util.Set<String> seleccionFija = new java.util.LinkedHashSet<>();
-
+    private java.time.LocalDate rangoDesde = null;
+    private java.time.LocalDate rangoHasta = null;
+    private boolean esperandoHasta = false; //Esto para que sea un click desde y segundo click hasta
 
 
     private final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -110,20 +112,33 @@ listGrupos.setSelectionModel(new javax.swing.DefaultListSelectionModel() {
 
         // Carga inicial
         cargarLicencias();
-        configurarSpinnersFecha();
-    }
-    //spinners
-    private void configurarSpinnersFecha() {
-    var m1 = new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.DAY_OF_MONTH);
-    var m2 = new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.DAY_OF_MONTH);
-    spDesde.setModel(m1);
-    spHasta.setModel(m2);
+        // Selección de rango con 2 clics en el calendario
+        jCalendar1.getDayChooser().addPropertyChangeListener("day", evt -> {
+        java.util.Date sel = jCalendar1.getDate();
+        java.time.LocalDate d = toLocalDate(sel);
+        
+        if (d == null) return;
 
-    var ed1 = new javax.swing.JSpinner.DateEditor(spDesde, "dd/MM/yyyy");
-    var ed2 = new javax.swing.JSpinner.DateEditor(spHasta, "dd/MM/yyyy");
-    spDesde.setEditor(ed1);
-    spHasta.setEditor(ed2);
-}
+        if (rangoDesde == null || !esperandoHasta) {
+            // 1er clic: fijamos DESDE y "abrimos" el rango
+            rangoDesde = d;
+            rangoHasta = null;
+            esperandoHasta = true;
+        } else {
+            // 2º clic: fijamos HASTA y cerramos el rango
+            if (d.isBefore(rangoDesde)) { //before o sea antes del dia ya seleccionado
+                // si el usuario clicó una fecha anterior, invertimos
+                rangoHasta = rangoDesde;
+                rangoDesde = d;
+                } else {
+                rangoHasta = d;
+            }
+            esperandoHasta = false;
+        }
+        actualizarEtiquetaRango();
+        });
+
+    }
     
     
     private void cargarLicencias() {
@@ -204,14 +219,14 @@ listGrupos.setSelectionModel(new javax.swing.DefaultListSelectionModel() {
         ElimDoc = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
-        spDesde = new javax.swing.JSpinner();
-        spHasta = new javax.swing.JSpinner();
         btnGuardar = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         jCalendar1 = new com.toedter.calendar.JCalendar();
         jScrollPane2 = new javax.swing.JScrollPane();
         listGrupos = new javax.swing.JList<>();
         txtBuscarGrupo = new javax.swing.JTextField();
+        lblRango = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -274,128 +289,137 @@ listGrupos.setSelectionModel(new javax.swing.DefaultListSelectionModel() {
 
         jScrollPane2.setViewportView(listGrupos);
 
+        jButton2.setText("Limpiar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(102, 102, 102)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel9)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(94, 94, 94)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(spDesde, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(26, 26, 26)
-                        .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(136, 136, 136)
-                        .addComponent(spHasta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(200, 200, 200)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCalendar1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7))
-                        .addGap(35, 35, 35))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtBuscarGrupo, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(108, 108, 108)))
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(17, 17, 17)
-                        .addComponent(btnRefrescar))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(jLabel5))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(24, 24, 24)
-                            .addComponent(btnEliminar)))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jLabel8)))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(322, Short.MAX_VALUE))
+                        .addComponent(jLabel9))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(58, 58, 58)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(8, 8, 8)
+                                .addComponent(jLabel6))
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jCalendar1, javax.swing.GroupLayout.PREFERRED_SIZE, 422, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
+                        .addComponent(jButton2)
+                        .addGap(56, 56, 56)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel7)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(43, 43, 43)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtBuscarGrupo, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(89, 89, 89)
+                                        .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(93, 93, 93))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(82, 82, 82)
+                        .addComponent(lblRango, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton1)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(154, 154, 154)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(17, 17, 17)
+                                .addComponent(btnRefrescar))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(jLabel5))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGap(24, 24, 24)
+                                    .addComponent(btnEliminar)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel8)))
+                        .addGap(28, 28, 28)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(142, 142, 142)
+                        .addComponent(ElimDoc))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(194, 194, 194)
                         .addComponent(labelNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(69, 69, 69)
+                        .addGap(85, 85, 85)
                         .addComponent(labelCedula, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(ElimDoc)
-                .addGap(71, 71, 71))
+                .addGap(104, 104, 104))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1)
-                        .addGap(84, 84, 84)
-                        .addComponent(btnRefrescar)
-                        .addGap(35, 35, 35)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(25, 25, 25)
-                        .addComponent(btnEliminar)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap(39, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(labelNombre)
-                                    .addComponent(labelCedula))
-                                .addGap(27, 27, 27))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(15, 15, 15)
-                                .addComponent(ElimDoc)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jCalendar1, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addComponent(jButton1)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(19, 19, 19)
-                        .addComponent(jLabel9)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel7)
-                        .addGap(4, 4, 4)))
+                        .addGap(28, 28, 28)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelNombre)
+                            .addComponent(labelCedula))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(40, 40, 40)
+                                .addComponent(btnRefrescar)
+                                .addGap(35, 35, 35)
+                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(25, 25, 25)
+                                .addComponent(btnEliminar))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(2, 2, 2)
+                                .addComponent(ElimDoc))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblRango, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9))
+                .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(117, 117, 117)
                         .addComponent(jLabel6)
                         .addGap(16, 16, 16)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel7)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(spDesde, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(spHasta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(70, 70, 70))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(txtBuscarGrupo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(107, 107, 107)
+                                        .addComponent(jButton2))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(102, 102, 102)
+                                        .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap(131, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(30, 30, 30)
+                                .addComponent(txtBuscarGrupo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(73, Short.MAX_VALUE))))
+                    .addComponent(jCalendar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         pack();
@@ -433,41 +457,47 @@ listGrupos.setSelectionModel(new javax.swing.DefaultListSelectionModel() {
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         
         try {
-            var d1 = (java.util.Date) spDesde.getValue();
-            var d2 = (java.util.Date) spHasta.getValue();
-
-            var desde = toLocalDate(d1);
-            var hasta = toLocalDate(d2);
-
-            if (desde == null) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Debe ingresar la fecha de inicio.");
+            // Validar rango del calendario
+            if (rangoDesde == null) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Seleccione al menos una fecha en el calendario.");
                 return;
             }
-            if (hasta != null && hasta.isBefore(desde)) {
-                javax.swing.JOptionPane.showMessageDialog(this, "La fecha fin no puede ser anterior a la fecha inicio.");
-                return;
-            }
-            var motivo = jTextField1.getText().trim();
-            java.util.List<String> gruposSel = new java.util.ArrayList<>(seleccionFija);
+            java.time.LocalDate desde = rangoDesde;
+            java.time.LocalDate hasta  = (rangoHasta != null ? rangoHasta : rangoDesde);
 
-            
+            String motivo = jTextField1.getText().trim();
             if (motivo.isEmpty()) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Ingrese un motivo.");
                 return;
             }
 
+            // Grupos elegidos 
+            java.util.List<String> gruposSel = new java.util.ArrayList<>(seleccionFija);
+            if (gruposSel.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Seleccione al menos un grupo.");
+                return;
+            }
+
+            // Armar y guardar
             var lic = new CapaLogica.Licencia();
             lic.setMotivo(motivo);
             lic.setFechaInicio(desde);
             lic.setFechaFin(hasta);
-            lic.setGrupos(gruposSel);;
-            
+            lic.setGrupos(gruposSel);
+
             int id = Consultar.guardarLicenciaConGrupos(ciDocente, lic, gruposSel);
             javax.swing.JOptionPane.showMessageDialog(this, (id > 0)
                 ? "Licencia guardada (ID " + id + ")"
                 : "Licencia guardada");
 
-            cargarLicencias();     // refresca la JTable
+            // Refrescar 
+            cargarLicencias();
+            // reset de rango para evitar confusiones
+            rangoDesde = null;
+            rangoHasta = null;
+            esperandoHasta = false;
+            actualizarEtiquetaRango();
+            jTextField1.setText("");
             
         } catch (Exception ex) {
             javax.swing.JOptionPane.showMessageDialog(this,
@@ -476,12 +506,17 @@ listGrupos.setSelectionModel(new javax.swing.DefaultListSelectionModel() {
         }
         limpiarFormulario();
     }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        rangoDesde = null;
+        rangoHasta = null;
+        esperandoHasta = false;
+        actualizarEtiquetaRango();
+
+    }//GEN-LAST:event_jButton2ActionPerformed
     private void limpiarFormulario() {
     jTextField1.setText("");
     listGrupos.clearSelection();
-    // Opcional: resetear fechas al día de hoy
-    spDesde.setValue(new java.util.Date());
-    spHasta.setValue(new java.util.Date());
     
     }
         
@@ -495,28 +530,42 @@ listGrupos.setSelectionModel(new javax.swing.DefaultListSelectionModel() {
     ));
     }
     private void aplicarFiltro(String q) {
+        
     String needle = (q == null ? "" : q.trim().toLowerCase());
 
     // Reconstruir el modelo con el filtro
-    modeloGrupos.clear();
-    for (String g : gruposBase) {
+    modeloGrupos.clear();//limpia
+    for (String g : gruposBase) {//recorre los grupos
         if (needle.isEmpty() || g.toLowerCase().contains(needle)) {
-            modeloGrupos.addElement(g);
+            modeloGrupos.addElement(g);//Agrega los elementos buscados
         }
     }
 
-    // Reaplicar selección: marcar lo que esté en seleccionFija y sea visible
+    // Reaplicar selección, esto ayuda a evitar que no se pierda lo seleccionado incluso cuando vaya a buscar otro grupo
     java.util.List<Integer> idx = new java.util.ArrayList<>();
     for (int i = 0; i < modeloGrupos.size(); i++) {
         if (seleccionFija.contains(modeloGrupos.getElementAt(i))) {
             idx.add(i);
         }
     }
-    // Pasar a int[]
+    // Pasar la lista en un int[] porque setSelectedIndices lo requiere asi
     int[] indices = new int[idx.size()];
     for (int i = 0; i < idx.size(); i++) indices[i] = idx.get(i);
     listGrupos.setSelectedIndices(indices);
-}
+    }
+    
+    private void actualizarEtiquetaRango() {
+    String t;
+    if (rangoDesde == null) {
+        t = "Rango: (sin seleccionar)";
+    } else if (rangoHasta == null) {
+        t = "Rango: " + rangoDesde.format(DF) + " — ?";
+    } else {
+        t = "Rango: " + rangoDesde.format(DF) + " — " + rangoHasta.format(DF);
+    }
+    lblRango.setText(t);
+    }
+
     
     /**
      * @param args the command line arguments
@@ -559,6 +608,7 @@ listGrupos.setSelectionModel(new javax.swing.DefaultListSelectionModel() {
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnRefrescar;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private com.toedter.calendar.JCalendar jCalendar1;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -570,9 +620,8 @@ listGrupos.setSelectionModel(new javax.swing.DefaultListSelectionModel() {
     private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel labelCedula;
     private javax.swing.JLabel labelNombre;
+    private javax.swing.JLabel lblRango;
     private javax.swing.JList<String> listGrupos;
-    private javax.swing.JSpinner spDesde;
-    private javax.swing.JSpinner spHasta;
     private javax.swing.JTable tabla;
     private javax.swing.JTextField txtBuscarGrupo;
     // End of variables declaration//GEN-END:variables

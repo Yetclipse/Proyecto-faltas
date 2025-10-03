@@ -18,32 +18,42 @@ Licencia l1 = new Licencia("Reposo médico", LocalDate.of(2025, 9, 1), LocalDate
  * @author sebas
  */
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Licencia {
     private int id;                     // es autoincrement
     private String motivo;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
-    private String gruposAfectados;
+    private java.util.List<String> grupos = new java.util.ArrayList<>();
 
     public Licencia() {} //por si acaso uno vacio
 
-    public Licencia(String motivo, LocalDate fechaInicio, LocalDate fechaFin, String gruposAfectados) {
+    public Licencia(String motivo, LocalDate fechaInicio, LocalDate fechaFin, List<String> grupos) {
         this.motivo = motivo;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.gruposAfectados = gruposAfectados;
+        setGrupos(grupos);
         validarFechas(); //es un metodo que esta creado por alla abajo
     }
 
     // Constructor completo (para leer desde la BD)
-    public Licencia(int id, String motivo, LocalDate fechaInicio, LocalDate fechaFin, String gruposAfectados) {
+    public Licencia(int id, String motivo, LocalDate fechaInicio, LocalDate fechaFin, List<String> grupos) {
         this.id = id;
         this.motivo = motivo;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.gruposAfectados = gruposAfectados;
+        setGrupos(grupos);
         validarFechas(); //es un metodo que esta creado por alla abajo
+    }
+    public Licencia(String motivo, LocalDate fechaInicio, LocalDate fechaFin, String gruposConcatenados) {
+        this.motivo = motivo;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        setGruposDesdeCadena(gruposConcatenados);
+        validarFechas();
     }
 
     // --- Getters/Setters ---
@@ -80,12 +90,28 @@ public class Licencia {
         this.fechaFin = fechaFin;
     }
 
-    public String getGruposAfectados() {
-        return gruposAfectados;
+    public List<String> getGrupos() { return grupos; }
+    public void setGrupos(List<String> grupos) {
+        this.grupos = (grupos == null) ? new ArrayList<>() : new ArrayList<>(grupos);
+    }
+    public void addGrupo(String g) {
+        if (g != null) {
+            String t = g.trim();
+            if (!t.isEmpty()) grupos.add(t);
+        }
     }
 
-    public void setGruposAfectados(String gruposAfectados) {
-        this.gruposAfectados = gruposAfectados;
+    // Helpers de compatibilidad/UI
+    public String getGruposConcatenados() {
+        return String.join("; ", grupos);
+    }
+    public void setGruposDesdeCadena(String gruposConcatenados) {
+        this.grupos = new ArrayList<>();
+        if (gruposConcatenados == null || gruposConcatenados.trim().isEmpty()) return;
+        Arrays.stream(gruposConcatenados.split(";"))
+              .map(String::trim)
+              .filter(s -> !s.isEmpty())
+              .forEach(grupos::add);
     }
     
 
@@ -101,6 +127,6 @@ public class Licencia {
     public String toString() {
         return "Licencia{id=" + id + ", motivo='" + motivo + '\'' +
                ", desde=" + fechaInicio + ", hasta=" + fechaFin +
-               ", grupos='" + gruposAfectados + "'}";
+               ", grupos='" + grupos + "'}";
     }
 }
