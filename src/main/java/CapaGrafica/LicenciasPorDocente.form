@@ -233,7 +233,7 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Comic Sans MS" size="18" style="1"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Seleciona uno"/>
+        <Property name="text" type="java.lang.String" value="Selecciona uno"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel6">
@@ -267,7 +267,7 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Comic Sans MS" size="18" style="1"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Grupo Afectados"/>
+        <Property name="text" type="java.lang.String" value="Grupos Afectados"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel8">
