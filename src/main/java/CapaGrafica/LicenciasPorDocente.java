@@ -11,6 +11,7 @@ import CapaPersistencia.LicenciaFilas;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 /**
  *
  * @author sebas
@@ -58,8 +59,9 @@ public class LicenciasPorDocente extends javax.swing.JFrame {
         }
         });
         // Hacer click para alternar (tipo checkbox) – lo que ya tienes:
-listGrupos.setSelectionModel(new javax.swing.DefaultListSelectionModel() {
-    @Override public void setSelectionInterval(int i0, int i1) {
+        listGrupos.setSelectionModel(new javax.swing.DefaultListSelectionModel() {
+        @Override 
+        public void setSelectionInterval(int i0, int i1) {
         if (isSelectedIndex(i0)) removeSelectionInterval(i0, i1);
         else                      addSelectionInterval(i0, i1);
     }
@@ -506,7 +508,6 @@ listGrupos.setSelectionModel(new javax.swing.DefaultListSelectionModel() {
         rangoHasta = null;
         esperandoHasta = false;
         actualizarEtiquetaRango();
-
     }//GEN-LAST:event_jButton2ActionPerformed
     private void limpiarFormulario() {
     jTextField1.setText("");

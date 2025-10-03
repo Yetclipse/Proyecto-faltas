@@ -30,13 +30,20 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
-            <!--El calendario-->
-           
         </dependency>
+        <!--El calendario-->
          <dependency>
          <groupId>com.toedter</groupId>
             <artifactId>jcalendar</artifactId>
             <version>1.4</version>
              </dependency>
+        <!-- Prueba de estilo-->
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>3.6</version>
+            <type>jar</type>
+        </dependency>
+
     </dependencies>
 </project>
