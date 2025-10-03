@@ -9,10 +9,6 @@ import CapaExcepcion.BDexcepcion;
 import java.sql.*;
 import CapaExcepcion.FaltasExcepcion;
 import CapaLogica.Licencia;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
 /**
  *
  * @author sebas
@@ -88,6 +84,9 @@ private static final String SQL_LISTAR_FALTA =
         ps.setString(5, docente.getTurno());
         
         resultado=ps.executeUpdate();
+        if(resultado <=0){
+            throw new Exception("No se pudo guardar");
+        }
         con.close();
     } catch (SQLException e) {
     String detalle = "SQLState=" + e.getSQLState() + ", code=" + e.getErrorCode() + ", msg=" + e.getMessage();

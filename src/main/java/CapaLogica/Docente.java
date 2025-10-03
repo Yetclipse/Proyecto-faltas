@@ -27,7 +27,10 @@ public class Docente {
             licencias.add(li);
         }
     }
-
+    @Override
+    public String toString() {
+        return apellido + " " + nombre + " (" + cedula + ")";
+    }
     public List<Licencia> getLicencias() {
         return licencias;
     }
@@ -71,10 +74,6 @@ public class Docente {
     public void setTurno(String turno) {
         this.turno = turno;
     }
-@Override
-public String toString() {
-    return apellido + " " + nombre + " (" + cedula + ")";
-}
 
    
 }

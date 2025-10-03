@@ -10,7 +10,6 @@ import CapaLogica.Docente;
 import CapaPersistencia.ConsultasFaltas;
 import java.util.List;
 import javax.swing.*;
-import java.awt.*;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;

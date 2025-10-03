@@ -8,11 +8,7 @@ package CapaGrafica;
  *
  * @author sebas
  */
-import CapaExcepcion.BDexcepcion;
 import CapaGrafica.Tabla;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 public class Inicio extends javax.swing.JFrame {
 
     /**

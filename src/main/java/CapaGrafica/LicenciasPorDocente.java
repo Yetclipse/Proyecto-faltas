@@ -5,14 +5,12 @@
 package CapaGrafica;
 
 import CapaPersistencia.ConsultasFaltas;
-import CapaPersistencia.ConsultasFaltas;
 import CapaExcepcion.BDexcepcion;
 import CapaExcepcion.FaltasExcepcion;
 import CapaPersistencia.LicenciaFilas;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 /**
  *
  * @author sebas
