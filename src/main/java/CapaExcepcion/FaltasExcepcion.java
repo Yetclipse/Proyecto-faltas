@@ -4,13 +4,18 @@
  */
 package CapaExcepcion;
 
-import java.sql.SQLException;
-
 /**
  *
  * @author sebas
  */
 public class FaltasExcepcion extends Exception {
+    //Esto es un número que identifica la version de la clase
+    //Cuando un objeto se serializa, Java guarda una "Firma" de la clase:
+    //Nombres de atributos, métodos, tipos de datos, etc.
+    //Cuando se intenta leer un objeto de vuelta, Java compara la firma con la clase acutal
+    //Si no coinciden salta un invalidClassExcepction
+    //Esto lo añadi para identificar los errores de mejor forma
+    // El "1L" es el valor de la version si quiero otra version puedo usar 2L y asi sucesivamente
     private static final long serialVersionUID = 1L;
 
     public FaltasExcepcion(String message) {
