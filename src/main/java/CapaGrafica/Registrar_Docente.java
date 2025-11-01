@@ -164,7 +164,7 @@ public class Registrar_Docente extends javax.swing.JFrame {
          docente.setMateria(Materia);
          docente.setTurno(Turno);
          fachada.guardarDocente(docente);
-         JOptionPane.showMessageDialog(this,"Se registro al docente");
+         JOptionPane.showMessageDialog(null,"Se registro al docente");
 
             } catch (Exception ex) {
 //Logger.getLogger(Personaje.class.getName()): Aquí se obtiene una instancia del Logger asociado con la clase Personaje. Logger es una clase proporcionada por el paquete java.util.logging que se utiliza para registrar mensajes de registro.
